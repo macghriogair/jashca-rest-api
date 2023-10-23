@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+    php:
+        build:
+            context: ./docker/php
+            dockerfile: Dockerfile
+        volumes:
+            - ./:/var/www/app/:rw
+            - ${COMPOSER_HOME:-$HOME/.composer}:/var/www/.composer:rw
+        restart: unless-stopped
+        depends_on:
+            - redis
+            - database
+
+    nginx:
+        build:
+            context: ./docker/nginx
+            dockerfile: Dockerfile
+        volumes:
+            - ./:/var/www/app/:cached
+        ports:
+            - "4444:80" # todo: ssl support
+        restart: unless-stopped
+        depends_on:
+            - php
+        env_file:
+            - docker/.env.nginx
+
+    ###> doctrine/doctrine-bundle ###
+    database:
+        image: postgres:${POSTGRES_VERSION:-15}-alpine
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB:-app}
+            # You should definitely change the password in production
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+            POSTGRES_USER: ${POSTGRES_USER:-app}
+        volumes:
+            - database_data:/var/lib/postgresql/data:rw
+            # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+            # - ./docker/db/data:/var/lib/postgresql/data:rw
+        restart: unless-stopped
+    ###< doctrine/doctrine-bundle ###
+
+    redis:
+        image: redis:6-alpine
+        restart: unless-stopped
+
+volumes:
+    ###> doctrine/doctrine-bundle ###
+    database_data:
+###< doctrine/doctrine-bundle ###

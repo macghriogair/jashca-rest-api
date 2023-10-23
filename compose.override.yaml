@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+    ###> doctrine/doctrine-bundle ###
+    database:
+        ports:
+            - "54322:5432"
+    ###< doctrine/doctrine-bundle ###
+
+    redis:
+        ports:
+            - "63799:6379"

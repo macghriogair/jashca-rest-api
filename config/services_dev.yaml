@@ -1,0 +1,11 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    ## test + dev data fixtures
+    App\DataFixtures\:
+        resource: '../fixtures/'
+
