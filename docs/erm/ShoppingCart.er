@@ -1,0 +1,49 @@
+title {
+    label: "ShoppingCart - Datamodel (Draft v0.1)",
+    size: "14",
+    font: "Helvetica"
+}
+
+[Basket] {bgcolor: "cyan", size: "20"}
+*id
+user_id {label: "unsigned int, nullable"}
+guest_id {label: "unsigned int, nullable"}
+status {label: "enum, default: pending"}
+created_at {label: "datetime_immutable"}
+updated_at {label: "datetime_immutable"}
+
+[BasketItem]  {bgcolor: "cyan", size: "16"}
+*product_id
+*basket_id
+quantity {label: "unsigned int, not null"}
+created_at {label: "datetime_immutable"}
+updated_at {label: "datetime_immutable"}
+
+[Product] {bgcolor: "lightgreen", size: "20"}
+*id
+stock_quantity {label: "unsigned int, not null"}
+reserved_quantity {label: "unsigned int, not null"}
+created_at {label: "datetime_immutable"}
+updated_at {label: "datetime_immutable"}
+
+[ProductPrice] {bgcolor: "lightgreen", size: "16"}
+*id
+*product_id
+amount {label: "unsigned int, not null"}
+currency {label: "string"}
+price_timestamp {label: "datetime_immutable"}
+vat {label: "integer"}
+created_at {label: "datetime_immutable"}
+updated_at {label: "datetime_immutable"}
+
+[User] {bgcolor: "orange", size: "20"}
+*id
+username
+password
+created_at {label: "datetime_immutable"}
+updated_at {label: "datetime_immutable"}
+
+Basket 1--* BasketItem
+BasketItem 1--1 Product
+Product 1--+ ProductPrice
+Basket 1--* User

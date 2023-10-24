@@ -67,6 +67,21 @@ phpunit:																## run phpunit
 phpcbf:																	## run phpcbf
 	$(call run_in_tools, vendor/bin/phpcbf)
 
+ERD_BIN := $(shell command -v erd-go 2> /dev/null)
+ERD_DIR := './docs/erm'
+ERD_FILES := $(notdir $(shell find $(ERD_DIR)/*.er -type f))
+
+.PHONY: build-erd
+build-erd: 																## buid erd diagrams from .er files
+	@echo "Generating SVGs from .er files..."
+ifndef ERD_BIN
+	$(error "erd or erd-go is required to run this target. Please install")
+endif
+	@for file in $(ERD_FILES); do \
+		$(ERD_BIN) -i $(ERD_DIR)/$$file | dot -Tsvg -o $(ERD_DIR)/$$file.svg; \
+	done;
+	@echo "Done."
+
 .PHONY: help
 help:																	## show this help
 	@IFS=$$'\n' ; \
