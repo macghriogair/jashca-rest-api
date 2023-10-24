@@ -1,25 +1,19 @@
-App\Entity\BasketItem:
+Domain\Entity\BasketItem:
     item_{1..3}:
         __construct:
             identifier: <uuid()>
             basket: '@basket_1'
             product: '@product_<current()>'
             quantity: 1
-            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
-            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>
     item_{4..8}:
         __construct:
             identifier: <uuid()>
             basket: '@basket_2'
             product: '@product_<current()>'
             quantity: <numberBetween(1,3)>
-            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
-            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>
     item_{9..10}:
         __construct:
             identifier: <uuid()>
             basket: '@basket_5'
             product: '@product_<current()>'
             quantity: <numberBetween(1,3)>
-            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
-            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>

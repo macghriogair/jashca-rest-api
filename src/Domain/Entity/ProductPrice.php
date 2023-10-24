@@ -6,6 +6,8 @@ namespace Domain\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Domain\ValueObject\ProductCurrency;
+use Domain\ValueObject\ProductVat;
 
 #[ORM\Embeddable]
 class ProductPrice

@@ -12,8 +12,11 @@ use Webmozart\Assert\Assert;
 
 #[ORM\Entity(repositoryClass: BasketItemRepository::class)]
 #[ORM\Table(name: 'basket_item', schema: 'public')]
+#[ORM\HasLifecycleCallbacks]
 class BasketItem
 {
+    use HasTimestampsTrait;
+
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     private ?UuidInterface $identifier = null;
 
@@ -29,10 +32,6 @@ class BasketItem
         private ?Product $product = null,
         #[ORM\Column]
         private ?int $quantity = null,
-        #[ORM\Column]
-        private ?\DateTimeImmutable $createdAt = null,
-        #[ORM\Column]
-        private ?\DateTimeImmutable $updatedAt = null,
     ) {
         Assert::nullOrUuid($identifier, 'Argument $identifier is not a valid UUID: %s');
         if (null !== $identifier) {
@@ -72,30 +71,6 @@ class BasketItem
     public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

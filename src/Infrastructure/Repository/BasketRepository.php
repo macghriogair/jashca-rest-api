@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Infrastructure\Repository;
 
+use Domain\Basket\Service\BasketDataAccess;
 use Domain\Entity\Basket;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Basket[]    findAll()
  * @method Basket[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BasketRepository extends ServiceEntityRepository
+class BasketRepository extends ServiceEntityRepository implements BasketDataAccess
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -47,4 +48,12 @@ class BasketRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function createBasket(Basket $basket): Basket
+    {
+        $em = $this->getEntityManager();
+        $em->persist($basket);
+        $em->flush();
+
+        return $basket;
+    }
 }

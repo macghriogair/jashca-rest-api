@@ -21,14 +21,12 @@ parameters:
         - RoboAssist Home Automation Hub
         - SoundWave Harmony Wireless Speaker
 
-App\Entity\Product:
+Domain\Entity\Product:
     product_{1..20}:
         __construct:
             id: ~
             identifier: <uuid()>
             name (unique): <randomElement(<{product_names}>)>
-            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
-            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>
             stockQuantity: <numberBetween(10, 200)>
             priceValue: <numberBetween(1000, 50000)>
             priceCurrency: 'EUR'

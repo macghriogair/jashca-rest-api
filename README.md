@@ -48,3 +48,18 @@ Execute all the tests:
 make docker.up
 make test
 ```
+
+## Authentication
+
+Authentication is provided through the [LexikJWTAuthenticationBundle](https://github.com/lexik/LexikJWTAuthenticationBundle).
+
+A JWT can be obtained via 
+
+```shell
+curl -X POST -H "Content-Type: application/json" \
+http://localhost:4444/api/login \
+-d '{"username":"john.smith@example.org","password":"pwned1234"}'
+```
+
+See `./fixtures/users.yaml` for available test Users.
+

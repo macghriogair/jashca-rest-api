@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace Domain\Entity;
 
-use Infrastructure\Repository\BasketRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Infrastructure\Repository\BasketRepository;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Webmozart\Assert\Assert;
 
 #[ORM\Entity(repositoryClass: BasketRepository::class)]
 #[ORM\Table(name: 'basket', schema: 'public')]
+#[ORM\HasLifecycleCallbacks]
 class Basket
 {
+    use HasTimestampsTrait;
+
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     private ?UuidInterface $identifier = null;
 
@@ -25,7 +29,12 @@ class Basket
     /**
      * @var Collection<BasketItem>
      */
-    #[ORM\OneToMany(mappedBy: 'basket', targetEntity: BasketItem::class, orphanRemoval: true)]
+    #[ORM\OneToMany(
+        mappedBy: 'basket',
+        targetEntity: BasketItem::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $basketItems;
 
     public function __construct(
@@ -34,12 +43,8 @@ class Basket
         #[ORM\Column]
         private ?int $id = null,
         ?string $identifier = null,
-        #[ORM\OneToOne(inversedBy: 'basket')]
-        private ?User $owner = null,
-        #[ORM\Column]
-        private ?\DateTimeImmutable $createdAt = null,
-        #[ORM\Column]
-        private ?\DateTimeImmutable $updatedAt = null,
+        #[ORM\OneToOne(inversedBy: 'basket', targetEntity: User::class)]
+        private User | UserInterface | null $owner = null,
         #[ORM\Column(type: 'text', nullable: true)]
         private ?string $guestToken = null,
         BasketStatus | string | null $status = null
@@ -90,29 +95,9 @@ class Basket
         $this->identifier = $identifier;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
     public function getGuestToken(): ?string
     {
         return $this->guestToken;
-    }
-
-    public function setCreatedAt(?\DateTimeImmutable $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
     }
 
     public function setGuestToken(?string $guestToken): void
@@ -120,12 +105,12 @@ class Basket
         $this->guestToken = $guestToken;
     }
 
-    public function getOwner(): ?User
+    public function getOwner(): User | UserInterface | null
     {
         return $this->owner;
     }
 
-    public function setOwner(?User $owner): void
+    public function setOwner(User | UserInterface | null $owner): void
     {
         $this->owner = $owner;
     }

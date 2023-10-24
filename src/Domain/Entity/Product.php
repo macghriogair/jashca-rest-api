@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Entity;
 
+use Domain\Entity\ProductPrice;
 use Infrastructure\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,8 +15,11 @@ use Webmozart\Assert\Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\Table(name: 'product', schema: 'public')]
+#[ORM\HasLifecycleCallbacks]
 class Product
 {
+    use HasTimestampsTrait;
+
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     private ?UuidInterface $identifier = null;
 
@@ -25,7 +29,12 @@ class Product
     /**
      * @var Collection<BasketItem>
      */
-    #[ORM\OneToMany(mappedBy: 'product', targetEntity: BasketItem::class, orphanRemoval: true)]
+    #[ORM\OneToMany(
+        mappedBy: 'product',
+        targetEntity: BasketItem::class,
+        fetch: 'EAGER',
+        orphanRemoval: true
+    )]
     private Collection $basketItems;
 
     public function __construct(
@@ -38,10 +47,6 @@ class Product
         private ?string $name = null,
         #[ORM\Column(nullable: false)]
         private ?int $stockQuantity = 0,
-        #[ORM\Column]
-        private ?\DateTimeImmutable $createdAt = null,
-        #[ORM\Column]
-        private ?\DateTimeImmutable $updatedAt = null,
         ?int $priceValue = null,
         ?string $priceCurrency = null,
         ?int $priceVat = null,
@@ -81,30 +86,6 @@ class Product
     public function setStockQuantity(int $stockQuantity): static
     {
         $this->stockQuantity = $stockQuantity;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

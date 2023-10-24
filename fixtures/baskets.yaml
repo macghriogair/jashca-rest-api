@@ -1,25 +1,18 @@
-App\Entity\Basket:
+Domain\Entity\Basket:
     basket_{1..3}:
         __construct:
             id: ~
             identifier: <uuid()>
-            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
-            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>
             guestToken (unique): '<( substr( md5( uniqid( rand(), true ) ) , 0, 20) )>'
-
 
     basket_4:
         __construct:
             id: ~
             identifier: <uuid()>
-            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
-            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>
             owner: '@user_1'
 
     basket_5:
         __construct:
             id: ~
             identifier: <uuid()>
-            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
-            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>
             owner: '@user_2'

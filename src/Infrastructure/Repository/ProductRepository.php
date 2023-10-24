@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Infrastructure\Repository;
 
-use Domain\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Domain\Entity\Product;
+use Domain\Inventory\Service\ProductDataAccess;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -16,35 +18,42 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Product[]    findAll()
  * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ProductRepository extends ServiceEntityRepository
+class ProductRepository extends ServiceEntityRepository implements ProductDataAccess
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Product::class);
     }
 
-//    /**
-//     * @return Product[] Returns an array of Product objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
+    /**
+     * @return Product[]
+     */
+    public function fetchProducts(): iterable
+    {
+        return $this->findAll();
+        // TODO: pagination sth. like
+//        $maxPerPage = self::MAX_ITEMS_PER_PAGE;
+//
+//        $query = $this->createQueryBuilder('p')
+//            ->leftJoin('p.basketItems', 'basketItems')
 //            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
+//            ->getQuery();
+//
+//        $paginator = new Paginator($query);
+//
+//        $paginator
 //            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+//            ->setFirstResult($maxPerPage * ($page - 1))
+//            ->setMaxResults($maxPerPage);
+//
+//        return $paginator;
+    }
 
-//    public function findOneBySomeField($value): ?Product
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @inheritDoc
+     */
+    public function findProductsByIdentifiers(array $identifiers): array
+    {
+        return $this->findBy(['identifier' => $identifiers]);
+    }
 }
