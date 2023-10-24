@@ -1,28 +1,30 @@
 <?php
 
-namespace App\Repository;
+declare(strict_types=1);
 
-use App\Entity\BasketItem;
+namespace Infrastructure\Repository;
+
+use Domain\Entity\Basket;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<BasketItem>
+ * @extends ServiceEntityRepository<Basket>
  *
- * @method BasketItem|null find($id, $lockMode = null, $lockVersion = null)
- * @method BasketItem|null findOneBy(array $criteria, array $orderBy = null)
- * @method BasketItem[]    findAll()
- * @method BasketItem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Basket|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Basket|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Basket[]    findAll()
+ * @method Basket[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BasketItemRepository extends ServiceEntityRepository
+class BasketRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, BasketItem::class);
+        parent::__construct($registry, Basket::class);
     }
 
 //    /**
-//     * @return BasketItem[] Returns an array of BasketItem objects
+//     * @return Basket[] Returns an array of Basket objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +38,7 @@ class BasketItemRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?BasketItem
+//    public function findOneBySomeField($value): ?Basket
 //    {
 //        return $this->createQueryBuilder('b')
 //            ->andWhere('b.exampleField = :val')
