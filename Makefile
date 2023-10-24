@@ -18,7 +18,7 @@ dev-init:  docker.up composer-install-dev								## init dev environment
 	$(call run_in_tools, bin/console lexik:jwt:generate-keypair --skip-if-exists)
 	$(SYMFONY_CMD) doctrine:database:drop --force || true
 	$(SYMFONY_CMD) doctrine:database:create
-	##$(SYMFONY_CMD) doctrine:migrations:migrate -n
+	$(SYMFONY_CMD) doctrine:migrations:migrate -n
 	$(MAKE) fixtures
 
 .PHONY: docker.up
@@ -36,7 +36,8 @@ shell:
 
 .PHONY: fixtures
 fixtures:																## exec doctrine fixtures
-	$(call run_in_tools, bin/console doctrine:fixtures:load --append)
+	#$(call run_in_tools, bin/console doctrine:fixtures:load --append)
+	$(SYMFONY_CMD) hautelook:fixtures:load -n -vv --no-bundles
 
 .PHONY: composer-install-dev
 composer-install-dev:													## install composer deps

@@ -1,0 +1,23 @@
+parameters:
+    pw_hash: $2y$13$AN.5GC78uqCTrD9kQsuTV.vnZO4V8VrJUzyXRbB8q6aeXjcyAE5gO # pwned1234
+
+App\Entity\User:
+    user_1:
+        __construct:
+            id: ~
+            email: john.smith@example.org
+            password: <{pw_hash}>
+            roles: '["ROLE_USER"]'
+    user_2:
+        __construct:
+            id: ~
+            email: martha.argerich@example.org
+            password: <{pw_hash}>
+            roles: '["ROLE_USER"]'
+    user_3:
+        __construct:
+            id: ~
+            email: batman@example.org
+            password: <{pw_hash}>
+            roles: '["ROLE_ADMIN"]'
+

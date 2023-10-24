@@ -1,0 +1,36 @@
+parameters:
+    product_names:
+        - QuantumGlide Pro Skateboard
+        - AeroTech Adventure Backpack
+        - EcoLux Solar-Powered Lantern
+        - ProVita Fitness Tracker
+        - ZeniWave Noise-Canceling Headphones
+        - AeroJet Pro Drone
+        - TerraFusion Organic Coffee Blend
+        - AquaPulse Smart Water Bottle
+        - SolarTech Home Energy System
+        - BioGlow Plant Growth Kit
+        - UrbanPulse Electric Scooter
+        - TimeGuard Smartwatch
+        - BioFresh Food Preservation System
+        - UrbanEaze Electric Bike
+        - XpressChef Smart Oven
+        - NatureSync Aromatherapy Diffuser
+        - SolarScape Garden Lighting Kit
+        - AeroHawk Air Purifier
+        - RoboAssist Home Automation Hub
+        - SoundWave Harmony Wireless Speaker
+
+App\Entity\Product:
+    product_{1..20}:
+        __construct:
+            id: ~
+            identifier: <uuid()>
+            name (unique): <randomElement(<{product_names}>)>
+            createdAt: <(new \DateTimeImmutable('2023-10-24'))>
+            updatedAt: <(new \DateTimeImmutable('2023-10-24'))>
+            stockQuantity: <numberBetween(10, 200)>
+            priceValue: <numberBetween(1000, 50000)>
+            priceCurrency: 'EUR'
+            priceVat: <intval(19)>
+

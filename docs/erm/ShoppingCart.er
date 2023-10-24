@@ -46,4 +46,4 @@ updated_at {label: "datetime_immutable"}
 Basket 1--* BasketItem
 BasketItem 1--1 Product
 Product 1--+ ProductPrice
-Basket 1--* User
+Basket 1--0 User
