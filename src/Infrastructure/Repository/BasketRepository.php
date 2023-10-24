@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Infrastructure\Repository;
 
-use Domain\Basket\Service\BasketDataAccess;
-use Domain\Entity\Basket;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Domain\Basket\Service\BasketDataAccess;
+use Domain\Entity\Basket;
 
 /**
  * @extends ServiceEntityRepository<Basket>
@@ -53,6 +53,20 @@ class BasketRepository extends ServiceEntityRepository implements BasketDataAcce
         $em = $this->getEntityManager();
         $em->persist($basket);
         $em->flush();
+
+        return $basket;
+    }
+
+    public function saveBasket(Basket $basket): Basket
+    {
+        $em = $this->getEntityManager();
+        if (false === $em->contains($basket)) {
+            throw new \RuntimeException(
+                'Cannot save a Basket that is not tracked by entity manager!'
+            );
+        }
+        $em->flush();
+        $em->clear();
 
         return $basket;
     }

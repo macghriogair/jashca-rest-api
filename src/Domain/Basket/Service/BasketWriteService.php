@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Basket\Service;
 
+use Domain\Basket\Command\AddItemToBasketCommand;
 use Domain\Basket\Command\CreateBasketCommand;
 use Domain\Basket\Exception\MissingUserOrGuestException;
 use Domain\Basket\Exception\PendingUserBasketConflictException;
+use Domain\Basket\Exception\ProductAlreadyInBasketException;
 use Domain\Basket\Exception\ProductNotFoundException;
 use Domain\Basket\Exception\ProductOutOfStockException;
 use Domain\Entity\Basket;
@@ -51,6 +53,46 @@ final class BasketWriteService implements BasketWriteServiceInterface
         $basket = $this->buildBasketEntity($command, $productsById);
 
         return $this->basketDataAccess->createBasket($basket);
+    }
+
+    #[AsMessageHandler]
+    public function handleAddItem(AddItemToBasketCommand $command): BasketItem
+    {
+        $basket = $command->getBasket();
+        $productIdentifier = $command->getItem()->getProductIdentifier();
+        $products = $this->productDataAccess->findProductsByIdentifiers(
+            [$productIdentifier]
+        );
+
+        if (1 !== count($products)) {
+            throw new ProductNotFoundException('Products could not be found.');
+        }
+
+        // check not already contained
+        foreach ($basket->getBasketItems() as $basketItem) {
+            if ($basketItem->getProduct()->getIdentifier()->equals($productIdentifier)) {
+                throw new ProductAlreadyInBasketException(
+                    sprintf('Product %s is already contained in basket.', $productIdentifier)
+                );
+            }
+        }
+
+        $this->assertProductStockNotExceeded(
+            $products[0],
+            $command->getItem()->getAmount()
+        );
+        
+        $newBasketItem = new BasketItem(
+            product: $products[0],
+            quantity: $command->getItem()->getAmount()
+        );
+        $newBasketItem->setIdentifier(Uuid::uuid4());
+
+        $basket->addBasketItem($newBasketItem);
+
+        $this->basketDataAccess->saveBasket($basket);
+
+        return $newBasketItem;
     }
 
     private function assertValidUserOrGuest(CreateBasketCommand $command): void

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Domain\Inventory\Service;
 
+use Domain\Entity\Basket;
+use Domain\Entity\BasketItem;
 use Domain\Entity\Product;
 use Ramsey\Uuid\UuidInterface;
 

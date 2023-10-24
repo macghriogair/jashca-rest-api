@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller\Basket;
 
-use Domain\Basket\Command\CreateBasketCommand;
+use Domain\Basket\Command\AddItemToBasketCommand;
 use Domain\Basket\Exception\DomainException;
 use Domain\Basket\Model\WriteBasketItem;
 use Domain\Entity\Basket;
+use Domain\Entity\BasketItem;
 use Infrastructure\Http\BasketItemDto;
-use Infrastructure\Http\CreateBasketDto;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Ramsey\Uuid\Uuid;
@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -25,17 +26,17 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[AsController]
-#[Route('/basket', name: 'api_basket_create', methods: ['POST'])]
-final class CreateBasketController implements LoggerAwareInterface
+#[Route('/basket/{identifier}', name: 'api_add_basket_item', methods: ['POST'])]
+final class AddBasketItemController implements LoggerAwareInterface
 {
-    use HandleTrait;
     use LoggerAwareTrait;
+    use HandleTrait;
 
     // TODO: service!
     private const GUEST_TOKEN_HEADER = 'X-GUEST-TOKEN';
 
     public function __construct(
-        //private readonly RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         private readonly TokenStorageInterface $tokenStorage,
         /** @phpstan-ignore-next-line required by HandleTrait */
         private MessageBusInterface $messageBus,
@@ -43,11 +44,26 @@ final class CreateBasketController implements LoggerAwareInterface
     }
 
     public function __invoke(
-        #[MapRequestPayload] CreateBasketDto $createBasketDto,
+        Basket $basket,
+        #[MapRequestPayload] BasketItemDto $basketItemDto,
     ): Response {
+        // TODO: extract
+        if (null !== ($user = $this->tokenStorage->getToken()?->getUser())) {
+            if ($user->getUserIdentifier() !== $basket->getOwner()?->getUserIdentifier()) {
+                throw new AccessDeniedHttpException();
+            }
+        }
+        $req = $this->requestStack->getCurrentRequest();
+        if (
+            null === $user
+            && $basket->getGuestToken() !== $req->headers->get(self::GUEST_TOKEN_HEADER)
+        ) {
+            throw new AccessDeniedHttpException();
+        }
+
         try {
             $result = $this->handle(
-                $this->mapToCommand($createBasketDto)
+                $this->mapToCommand($basket, $basketItemDto)
             );
         } catch (HandlerFailedException $e) {
             $this->logger->error($e->getMessage(), [$e]);
@@ -55,9 +71,9 @@ final class CreateBasketController implements LoggerAwareInterface
             throw $e->getPrevious() instanceof DomainException ? $e->getPrevious() : $e;
         }
 
-        if (false === $result instanceof Basket) {
+        if (false === $result instanceof BasketItem) {
             return new JsonResponse(
-                ['message' => 'Failed to create basket'],
+                ['message' => 'Failed to add basket item'],
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
@@ -66,37 +82,24 @@ final class CreateBasketController implements LoggerAwareInterface
             null,
             Response::HTTP_CREATED,
             headers: [
-                'Location' => '/api/basket/' . $result->getIdentifier(),
-                self::GUEST_TOKEN_HEADER => $result->getGuestToken(),
+                // TODO: use Router to generate the url
+                'Location' => sprintf(
+                    '/api/basket/%s/item/%s',
+                    $basket->getIdentifier(),
+                    $result->getIdentifier()
+                ),
             ]
         );
     }
 
-    private function mapToCommand(CreateBasketDto $createBasketDto): CreateBasketCommand
+    private function mapToCommand(Basket $basket, BasketItemDto $basketItemDto): AddItemToBasketCommand
     {
-        // either an authenticated user or a guest
-        if (null === ($user = $this->tokenStorage->getToken()?->getUser())) {
-            //$req = $this->requestStack->getCurrentRequest();
-            $guestToken = Uuid::uuid4()->toString();
-            // either not reuse on create OR check for unique basket per guest
-            /*if ($req->headers->get(self::GUEST_TOKEN_HEADER)) {
-                $guestToken = $req->headers->get(self::GUEST_TOKEN_HEADER);
-            } else {
-                // TODO: use jwt someday for adding trusted data
-                $guestToken = Uuid::uuid4()->toString();
-            }*/
-        }
-
-        return new CreateBasketCommand(
-            items: array_map(
-                fn (BasketItemDto $itemDto) => new WriteBasketItem(
-                    Uuid::fromString($itemDto->productId),
-                    $itemDto->amount
-                ),
-                $createBasketDto->items
-            ),
-            user: $user,
-            guestToken: $guestToken ?? null
+        return new AddItemToBasketCommand(
+            basket: $basket,
+            item: new WriteBasketItem(
+                productIdentifier: Uuid::fromString($basketItemDto->productId),
+                amount: $basketItemDto->amount
+            )
         );
     }
 }
