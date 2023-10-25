@@ -1,7 +1,7 @@
 ARG TIMEZONE=Europe/Berlin
 ARG PHP_VERSION=8.2
 
-FROM php:${PHP_VERSION}-fpm
+FROM php:${PHP_VERSION}-fpm as development
 
 RUN apt update \
     && apt install -y zlib1g-dev g++ git libicu-dev zip libzip-dev libpq-dev zip jq \
@@ -28,3 +28,14 @@ EXPOSE 9000
 RUN chown -R www-data:www-data /run /var/www/app
 
 USER www-data
+
+FROM development as worker
+
+USER root
+
+RUN apt update && apt install -y --no-install-recommends supervisor
+
+COPY ./supervisor-conf /etc/supervisor/
+COPY ./worker-start.sh /startup.sh
+
+CMD ["/bin/bash", "/startup.sh"]

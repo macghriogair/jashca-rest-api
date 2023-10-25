@@ -35,6 +35,18 @@ The application, by default, should be running at: [http://localhost:4444](http:
 
 Check out the docs:  [http://localhost:4444/api/doc](http://localhost:4444/api/doc)
 
+### Start Queue Workers manually
+
+A Symfony Messenger Consumer is running in a dedicated worker container. If for some
+reason it fails to start, you can start it manually via:
+
+```shell
+make worker.start
+```
+
+*Note:* For demo purposes, Postges/Doctrine is used as a transport. In a real world scenario, you
+might want to use sth. like RabbitMQ or Beanstalkd.
+
 
 ### Execute Symfony Console Commands
 

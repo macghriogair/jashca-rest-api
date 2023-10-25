@@ -20,6 +20,7 @@ dev-init:  docker.up composer-install-dev								## init dev environment
 	$(SYMFONY_CMD) doctrine:database:create
 	$(SYMFONY_CMD) doctrine:migrations:migrate -n
 	$(MAKE) fixtures
+	$(MAKE) worker.start
 
 .PHONY: docker.up
 docker.up:																## start docker stack
@@ -28,7 +29,11 @@ docker.up:																## start docker stack
 
 .PHONY: docker.down
 docker.down:															## stop docker stack
-	docker compose down -t0 --volumes
+	COMPOSE_PROFILES=worker docker compose down -t0 --volumes
+
+.PHONY: worker.start
+worker.start:															## start queue worker
+	COMPOSE_PROFILES=worker docker compose up -d --force-recreate php-worker
 
 .PHONY: shell
 shell:

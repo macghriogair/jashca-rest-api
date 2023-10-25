@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Infrastructure\Repository;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Domain\Basket\Service\BasketDataAccess;
 use Domain\Entity\Basket;
+use Domain\Entity\BasketStatus;
 
 /**
  * @extends ServiceEntityRepository<Basket>
@@ -69,5 +73,39 @@ class BasketRepository extends ServiceEntityRepository implements BasketDataAcce
         $em->clear();
 
         return $basket;
+    }
+
+    /**
+     * Delete pending Baskets and release reserved items.
+     *
+     * @return int the number of deleted rows
+     */
+    public function cleanupPendingBaskets(DateTimeImmutable $olderThan, int $limit = 100): int
+    {
+        // TODO: fixme UniqueConstraintViolation -> check Basket.basketItems cascade mapping
+        $em = $this->getEntityManager();
+        $query = $this->createQueryBuilder('b')
+            ->select()
+            ->where('b.updatedAt <= :olderThan')
+            ->andWhere('b.status = :status')
+            ->setParameter('olderThan', $olderThan)
+            ->setParameter('status', BasketStatus::PENDING->value)
+            ->setMaxResults($limit)
+            ->getQuery();
+
+        $toDelete = $query->execute();
+        $count = 0;
+        /** @var Basket $basket */
+        foreach ($toDelete as $basket) {
+            ++$count;
+            foreach ($basket->getBasketItems() as $item) {
+                $em->remove($item);
+            }
+            $em->remove($basket);
+        }
+        $em->flush();
+        $em->clear();
+
+        return $count;
     }
 }

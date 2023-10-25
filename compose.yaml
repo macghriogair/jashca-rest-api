@@ -5,6 +5,7 @@ services:
         build:
             context: ./docker/php
             dockerfile: Dockerfile
+            target: development
         volumes:
             - ./:/var/www/app/:rw
             - ${COMPOSER_HOME:-$HOME/.composer}:/var/www/.composer:rw
@@ -12,6 +13,20 @@ services:
         depends_on:
             - redis
             - database
+
+    php-worker:
+        build:
+            context: ./docker/php
+            dockerfile: Dockerfile
+            target: worker
+        volumes:
+            - ./:/var/www/app/:rw
+            - ${COMPOSER_HOME:-$HOME/.composer}:/var/www/.composer:rw
+        restart: unless-stopped
+        depends_on:
+            - redis
+            - database
+        profiles: ["worker"]
 
     nginx:
         build:
