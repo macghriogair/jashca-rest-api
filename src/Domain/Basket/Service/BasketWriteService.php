@@ -81,7 +81,7 @@ final class BasketWriteService implements BasketWriteServiceInterface
             $products[0],
             $command->getItem()->getAmount()
         );
-        
+
         $newBasketItem = new BasketItem(
             product: $products[0],
             quantity: $command->getItem()->getAmount()

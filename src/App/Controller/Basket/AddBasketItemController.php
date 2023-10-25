@@ -10,6 +10,8 @@ use Domain\Basket\Model\WriteBasketItem;
 use Domain\Entity\Basket;
 use Domain\Entity\BasketItem;
 use Infrastructure\Http\BasketItemDto;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Ramsey\Uuid\Uuid;
@@ -43,6 +45,23 @@ final class AddBasketItemController implements LoggerAwareInterface
     ) {
     }
 
+    #[OA\Tag(name: 'Basket')]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(content: new Model(type: BasketItemDto::class)),
+        parameters: [
+            new OA\Parameter(
+                name: 'identifier',
+                description: 'The Basket id',
+                in: 'path',
+                schema: new OA\Schema(type: 'string'),
+                example: '0b13e52d-b058-32fb-8507-10dec634a07c'
+            ),
+        ]
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Item was added to basket.',
+    )]
     public function __invoke(
         Basket $basket,
         #[MapRequestPayload] BasketItemDto $basketItemDto,

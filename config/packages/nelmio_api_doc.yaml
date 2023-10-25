@@ -4,6 +4,60 @@ nelmio_api_doc:
             title: JASHCA OpenAPI Doc
             description: This will be an awesome app!
             version: 1.0.0
+        servers:
+            -   url: '%app.base_url%'
+        components: # fka definitions in swagger
+                # Authentication
+                securitySchemes:
+                    bearerAuth:
+                        type: http
+                        scheme: bearer
+                        bearerFormat: JWT
+                    guestToken:
+                        type: apiKey
+                        in: header
+                        name: X-GUEST-TOKEN
+                        description: Guest requests to baskets must include the `X-GUEST-TOKEN` header
+
+                schemas: [ ]
+        paths:
+            /api/login:
+                post:
+                    summary: Authenticate to obtain a JWT.
+                    tags:
+                        - Auth
+                    operationId: postToken
+                    requestBody:
+                        content:
+                            'application/json':
+                                schema:
+                                    type: object
+                                    required: [username, password]
+                                    properties:
+                                        username:
+                                            type: string
+                                            example: "john.smith@example.org"
+                                        password:
+                                            type: string
+                                            example: "pwned1234"
+                    responses:
+                        '200':
+                            description: Authentication successful
+                            content:
+                                'application/json':
+                                    schema:
+                                        type: object
+                                        required: [ token ]
+                                        properties:
+                                            token:
+                                                type: string
+                                                description: access token for authenticated requests
+                        '401':
+                            description: Bad credentials
+
+        security:
+            - bearerAuth: [ ]
+            - guestToken: [ ]
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc(\.json)?$) # Accepts routes under /api except /api/doc /api/doc.json

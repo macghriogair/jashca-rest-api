@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controller\Inventory;
 
+use Domain\Inventory\Model\ReadProduct;
 use Domain\Inventory\Query\ListProductsQuery;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Messenger\HandleTrait;
@@ -25,6 +28,15 @@ final class GetProductListController
     ) {
     }
 
+    #[OA\Tag(name: 'Product')]
+    #[OA\Response(
+        response: 200,
+        description: 'List available products',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: ReadProduct::class))
+        )
+    )]
     public function __invoke(): JsonResponse
     {
         $result = $this->handle(new ListProductsQuery());

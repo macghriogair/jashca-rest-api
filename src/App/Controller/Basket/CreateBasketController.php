@@ -8,8 +8,11 @@ use Domain\Basket\Command\CreateBasketCommand;
 use Domain\Basket\Exception\DomainException;
 use Domain\Basket\Model\WriteBasketItem;
 use Domain\Entity\Basket;
+use Domain\Entity\User;
 use Infrastructure\Http\BasketItemDto;
 use Infrastructure\Http\CreateBasketDto;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Ramsey\Uuid\Uuid;
@@ -42,6 +45,14 @@ final class CreateBasketController implements LoggerAwareInterface
     ) {
     }
 
+    #[OA\Tag(name: 'Basket')]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(content: new Model(type: CreateBasketDto::class))
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Basket was created successfully',
+    )]
     public function __invoke(
         #[MapRequestPayload] CreateBasketDto $createBasketDto,
     ): Response {
