@@ -29,6 +29,12 @@ via Makefile:
 make dev-init
 ```
 
+The application, by default, should be running at: [http://localhost:4444](http://localhost:4444)
+
+### Open Api Docs
+
+Check out the docs:  [http://localhost:4444/api/doc](http://localhost:4444/api/doc)
+
 
 ### Execute Symfony Console Commands
 
@@ -62,4 +68,22 @@ http://localhost:4444/api/login \
 ```
 
 See `./fixtures/users.yaml` for available test Users.
+
+
+## Test Data
+
+Reset the test data by executing the Alice fixtures:
+
+```shell
+make fixtures
+```
+
+## Postman Collection
+
+All available endpoints can be tested via Postman.
+
+Import the collection from `./docs/Jashca API.postman_collection.json` and run all tests:
+
+![Postman Tests](./docs/assets/jashca_postman_test_sample.png)
+
 

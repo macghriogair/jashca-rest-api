@@ -1,0 +1,736 @@
+{
+	"info": {
+		"_postman_id": "55c3dc0c-3a44-4043-bc73-58fa69528f05",
+		"name": "Jashca API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "186430"
+	},
+	"item": [
+		{
+			"name": "GET Api Docs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The response has all properties\", () => {",
+							"    //parse the response JSON and test three properties",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.openapi).to.eql('3.0.0');",
+							"    pm.expect(responseJson.info).to.be.a('object');",
+							"    pm.expect(responseJson.paths).to.be.a('object');",
+							"    // pm.expect(responseJson.components).to.be.a('object');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api_url}}/api/doc.json",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"api",
+						"doc.json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Api Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The response has all properties\", () => {",
+							"    //parse the response JSON and set token variable",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.token).to.be.a('string');",
+							"",
+							"    pm.collectionVariables.set('auth_token', responseJson.token);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"john.smith@example.org\",\n    \"password\": \"pwned1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}/api/login",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "READ Products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The response has all properties\", () => {",
+							"    //parse the response JSON and test three properties",
+							"    const jsonData = pm.response.json();",
+							"",
+							"    pm.expect(jsonData).to.have.lengthOf(20);",
+							"    pm.collectionVariables.set('a_product_id', jsonData[0]['id']);",
+							"    pm.collectionVariables.set('another_product_id', jsonData[1]['id']);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{api_url}}/api/product",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"api",
+						"product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE Cart (Guest)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"",
+							"  let responseHeaders = pm.response.headers;",
+							"  pm.response.to.have.header('X-GUEST-TOKEN');",
+							"  pm.response.to.have.header('Location');",
+							"  pm.collectionVariables.set('guest_token', responseHeaders.get('X-GUEST-TOKEN'));",
+							"  pm.collectionVariables.set('guest_basket_url', responseHeaders.get('Location'));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-GUEST-TOKEN",
+						"value": "d07e931a-6034-4f27-bcb1-a0dd7c4aa763",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}/api/basket",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"api",
+						"basket"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show Cart (Guest)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-GUEST-TOKEN",
+						"value": "{{guest_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{api_url}}{{guest_basket_url}}",
+					"host": [
+						"{{api_url}}{{guest_basket_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Item to Cart (Guest)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"",
+							"  let responseHeaders = pm.response.headers;",
+							"  pm.response.to.have.header('Location');",
+							"  pm.collectionVariables.set('guest_basket_item_url', responseHeaders.get('Location'));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-GUEST-TOKEN",
+						"value": "{{guest_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": \"{{a_product_id}}\",\n    \"amount\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}{{guest_basket_url}}",
+					"host": [
+						"{{api_url}}{{guest_basket_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE Item in Cart (Guest)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-GUEST-TOKEN",
+						"value": "{{guest_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}{{guest_basket_item_url}}",
+					"host": [
+						"{{api_url}}{{guest_basket_item_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Item from Basket (Guest)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"  pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-GUEST-TOKEN",
+						"value": "{{guest_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}{{guest_basket_item_url}}",
+					"host": [
+						"{{api_url}}{{guest_basket_item_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE Cart (User)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 2010\", function () {",
+							"  pm.response.to.have.status(201);",
+							"",
+							"  let responseHeaders = pm.response.headers;",
+							"  pm.response.to.have.header('Location');",
+							"  pm.collectionVariables.set('user_basket_url', responseHeaders.get('Location'));",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-GUEST-TOKEN",
+						"value": "d07e931a-6034-4f27-bcb1-a0dd7c4aa763",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"items\": [{\"productId\": \"{{a_product_id}}\", \"amount\": 20}]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}/api/basket",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"api",
+						"basket"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show Cart (User)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{api_url}}{{user_basket_url}}",
+					"host": [
+						"{{api_url}}{{user_basket_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Item to Cart (User)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"",
+							"  let responseHeaders = pm.response.headers;",
+							"  pm.response.to.have.header('Location');",
+							"  pm.collectionVariables.set('user_basket_item_url', responseHeaders.get('Location'));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": \"{{another_product_id}}\",\n    \"amount\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}{{user_basket_url}}",
+					"host": [
+						"{{api_url}}{{user_basket_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE Item in Cart (User)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-GUEST-TOKEN",
+						"value": "9aa0807d-6715-4ffb-99be-546854d8eb4c",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}{{user_basket_item_url}}",
+					"host": [
+						"{{api_url}}{{user_basket_item_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Item from Basket (User)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"  pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}{{user_basket_item_url}}",
+					"host": [
+						"{{api_url}}{{user_basket_item_url}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api_url",
+			"value": "http://localhost:4444",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": ""
+		},
+		{
+			"key": "guest_token",
+			"value": ""
+		},
+		{
+			"key": "guest_basket_url",
+			"value": ""
+		},
+		{
+			"key": "a_product_id",
+			"value": ""
+		},
+		{
+			"key": "guest_basket_item_url",
+			"value": ""
+		},
+		{
+			"key": "user_basket_url",
+			"value": ""
+		},
+		{
+			"key": "another_product_id",
+			"value": ""
+		},
+		{
+			"key": "user_basket_item_url",
+			"value": ""
+		}
+	]
+}

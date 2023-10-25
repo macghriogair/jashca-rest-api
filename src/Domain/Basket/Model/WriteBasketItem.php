@@ -10,10 +10,10 @@ final readonly class WriteBasketItem
 {
     public function __construct(
         private UuidInterface $productIdentifier,
-        private int $amount
+        private int $amount,
+        private ?UuidInterface $basketItemIdentifier = null,
     ) {
     }
-
     public function getProductIdentifier(): UuidInterface
     {
         return $this->productIdentifier;
@@ -22,5 +22,10 @@ final readonly class WriteBasketItem
     public function getAmount(): int
     {
         return $this->amount;
+    }
+
+    public function getBasketItemIdentifier(): ?UuidInterface
+    {
+        return $this->basketItemIdentifier;
     }
 }

@@ -6,6 +6,9 @@ namespace Domain\Basket\Service;
 
 use Domain\Basket\Command\AddItemToBasketCommand;
 use Domain\Basket\Command\CreateBasketCommand;
+use Domain\Basket\Command\DeleteBasketItemCommand;
+use Domain\Basket\Command\UpdateBasketItemCommand;
+use Domain\Basket\Exception\InvalidBasketStatusException;
 use Domain\Basket\Exception\MissingUserOrGuestException;
 use Domain\Basket\Exception\PendingUserBasketConflictException;
 use Domain\Basket\Exception\ProductAlreadyInBasketException;
@@ -59,6 +62,8 @@ final class BasketWriteService implements BasketWriteServiceInterface
     public function handleAddItem(AddItemToBasketCommand $command): BasketItem
     {
         $basket = $command->getBasket();
+        $this->assertBasketStatusAllowsEdit($basket);
+
         $productIdentifier = $command->getItem()->getProductIdentifier();
         $products = $this->productDataAccess->findProductsByIdentifiers(
             [$productIdentifier]
@@ -93,6 +98,47 @@ final class BasketWriteService implements BasketWriteServiceInterface
         $this->basketDataAccess->saveBasket($basket);
 
         return $newBasketItem;
+    }
+
+    #[AsMessageHandler]
+    public function handleUpdateItem(UpdateBasketItemCommand $command): BasketItem
+    {
+        $basket = $command->getBasket();
+        $this->assertBasketStatusAllowsEdit($basket);
+
+        /** @var BasketItem $basketItem */
+        $basketItem = $basket->getBasketItems()->filter(
+            fn (BasketItem $i) => $i->getIdentifier() === $command->getItem()->getBasketItemIdentifier()
+        )->first();
+
+        $updateAmount = $command->getItem()->getAmount();
+        $currentAmount = $basketItem->getQuantity();
+
+        if ($updateAmount > $currentAmount) {
+            $this->assertProductStockNotExceeded(
+                $basketItem->getProduct(),
+                ($updateAmount - $currentAmount) // only stock for diff needed
+            );
+        }
+        $basketItem->setQuantity($updateAmount);
+        $this->basketDataAccess->saveBasket($basket);
+
+        return $basketItem;
+    }
+
+    #[AsMessageHandler]
+    public function handleDeleteItem(DeleteBasketItemCommand $command): void
+    {
+        $basket = $command->getBasket();
+        $this->assertBasketStatusAllowsEdit($basket);
+
+        /** @var BasketItem $basketItem */
+        $basketItem = $basket->getBasketItems()->filter(
+            fn (BasketItem $i) => $i->getIdentifier() === $command->getBasketItemIdentifier()
+        )->first();
+
+        $basket->removeBasketItem($basketItem);
+        $this->basketDataAccess->saveBasket($basket);
     }
 
     private function assertValidUserOrGuest(CreateBasketCommand $command): void
@@ -165,5 +211,20 @@ final class BasketWriteService implements BasketWriteServiceInterface
         }
 
         return $basket;
+    }
+
+    /**
+     * Only pending Baskets are allowed to be modified.
+     */
+    private function assertBasketStatusAllowsEdit(Basket $basket): void
+    {
+        if ($basket->getStatus() !== BasketStatus::PENDING) {
+            throw new InvalidBasketStatusException(
+                sprintf(
+                    'Cannot modify basked with status: %s',
+                    $basket->getStatus()->value
+                )
+            );
+        }
     }
 }

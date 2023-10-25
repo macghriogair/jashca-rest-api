@@ -9,6 +9,7 @@ use Domain\Inventory\Query\ListProductsQuery;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -29,9 +30,10 @@ final class GetProductListController
     }
 
     #[OA\Tag(name: 'Product')]
+    #[OA\Get(summary: 'List products')]
     #[OA\Response(
-        response: 200,
-        description: 'List available products',
+        response: Response::HTTP_OK,
+        description: 'List of available products',
         content: new OA\JsonContent(
             type: 'array',
             items: new OA\Items(ref: new Model(type: ReadProduct::class))

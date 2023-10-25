@@ -1,18 +1,15 @@
 Domain\Entity\Basket:
+    # guest baskets
     basket_{1..3}:
         __construct:
             id: ~
             identifier: <uuid()>
-            guestToken (unique): '<( substr( md5( uniqid( rand(), true ) ) , 0, 20) )>'
+            guestToken: <uuid()>
 
+    # user baskets
     basket_4:
         __construct:
             id: ~
             identifier: <uuid()>
-            owner: '@user_1'
-
-    basket_5:
-        __construct:
-            id: ~
-            identifier: <uuid()>
             owner: '@user_2'
+

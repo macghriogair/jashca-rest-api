@@ -14,6 +14,6 @@ Domain\Entity\BasketItem:
     item_{9..10}:
         __construct:
             identifier: <uuid()>
-            basket: '@basket_5'
+            basket: '@basket_4'
             product: '@product_<current()>'
             quantity: <numberBetween(1,3)>
