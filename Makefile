@@ -49,7 +49,7 @@ composer-install-dev:													## install composer deps
 	$(call run_in_tools, composer i --ignore-platform-reqs)
 
 .PHONY: test
-test: lint phpcs phpstan phpunit										## run all tests
+test: lint phpcs phpstan phpunit behat									## run all tests
 
 .PHONY: lint
 lint:																	## run linters
@@ -67,7 +67,11 @@ phpstan:																## run phpstan
 
 .PHONY: phpunit
 phpunit:																## run phpunit
-	$(call run_in_tools, bin/phpunit --testdox) ## todo: use phpunit image
+	$(call run_in_tools, bin/phpunit --testdox)
+
+.PHONY: behat															## run behat api tests
+behat:
+	$(call run_in_tools, ./vendor/bin/behat --no-snippets -v)
 
 .PHONY: phpcbf
 phpcbf:																	## run phpcbf

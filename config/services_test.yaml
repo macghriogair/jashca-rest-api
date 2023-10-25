@@ -5,4 +5,5 @@ services:
         autowire: true
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-
+    Tests\Behat\:
+        resource: '../tests/Behat/*'

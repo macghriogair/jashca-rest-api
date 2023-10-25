@@ -1,0 +1,13 @@
+default:
+    suites:
+        default:
+            contexts:
+                - Tests\Behat\ApiContext
+
+    extensions:
+        FriendsOfBehat\SymfonyExtension:
+            bootstrap: tests/bootstrap.php
+        Behat\MinkExtension:
+            sessions:
+                default:
+                    symfony: ~
