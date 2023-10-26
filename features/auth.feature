@@ -1,3 +1,4 @@
+@default @auth
 Feature:
     In order to issue authenticated requests
     As a user

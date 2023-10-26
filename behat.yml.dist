@@ -3,10 +3,23 @@ default:
         default:
             contexts:
                 - Tests\Behat\ApiContext
-
+            filters:
+                tags: "@default"
+        auth:
+            contexts:
+                - Tests\Behat\ApiContext
+            filters:
+                 tags: "@auth"
+        basket:
+            contexts:
+                - Tests\Behat\ApiContext
+            filters:
+                 tags: "@basket"
     extensions:
         FriendsOfBehat\SymfonyExtension:
             bootstrap: tests/bootstrap.php
+        # wrap all testcases in transactions that will be rolled back between tests
+        DAMA\DoctrineTestBundle\Behat\ServiceContainer\DoctrineExtension: ~
         Behat\MinkExtension:
             sessions:
                 default:
