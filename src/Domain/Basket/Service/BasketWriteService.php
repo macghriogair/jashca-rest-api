@@ -111,16 +111,16 @@ final class BasketWriteService implements BasketWriteServiceInterface
             fn (BasketItem $i) => $i->getIdentifier() === $command->getItem()->getBasketItemIdentifier()
         )->first();
 
-        $updateAmount = $command->getItem()->getAmount();
+        $targetAmount = $command->getItem()->getAmount();
         $currentAmount = $basketItem->getQuantity();
 
-        if ($updateAmount > $currentAmount) {
+        if ($targetAmount > $currentAmount) {
             $this->assertProductStockNotExceeded(
                 $basketItem->getProduct(),
-                ($updateAmount - $currentAmount) // only stock for diff needed
+                ($targetAmount - $currentAmount) // only stock for diff needed
             );
         }
-        $basketItem->setQuantity($updateAmount);
+        $basketItem->setQuantity($targetAmount);
         $this->basketDataAccess->saveBasket($basket);
 
         return $basketItem;
@@ -173,7 +173,7 @@ final class BasketWriteService implements BasketWriteServiceInterface
 
     private function assertProductStockNotExceeded(
         Product $currentProduct,
-        int $targetAmount
+        int $targetAmount,
     ): void {
         if (false === $this->inventoryTracker->isStockSufficient($currentProduct, $targetAmount)) {
             throw new ProductOutOfStockException(
