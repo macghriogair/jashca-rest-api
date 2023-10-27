@@ -38,7 +38,12 @@
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
+        "behat/behat": "^3.13",
         "coduo/php-matcher": "^6.0",
+        "dama/doctrine-test-bundle": "^7.2",
+        "friends-of-behat/mink-browserkit-driver": "^1.6",
+        "friends-of-behat/mink-extension": "^2.7",
+        "friends-of-behat/symfony-extension": "^2.4",
         "hautelook/alice-bundle": "*",
         "overtrue/phplint": "^9.0",
         "phpstan/extension-installer": "^1.3",
@@ -73,6 +78,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Tests\\Behat\\": "tests/Behat/",
             "Tests\\Functional\\": "tests/Functional/",
             "Tests\\Unit\\": "tests/Unit/"
         }

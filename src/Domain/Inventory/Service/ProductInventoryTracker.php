@@ -11,7 +11,7 @@ final class ProductInventoryTracker implements ProductInventoryTrackerInterface
 {
     public function isStockSufficient(Product $product, int $targetAmount): bool
     {
-        return $this->getActualAvailableAmount($product) > $targetAmount;
+        return $this->getActualAvailableAmount($product) >= $targetAmount;
     }
 
     public function getActualAvailableAmount(Product $product): int
